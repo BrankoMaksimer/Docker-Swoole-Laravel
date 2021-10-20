@@ -1,0 +1,34 @@
+version: "3.1"
+services:
+ nginx:
+  image: nginx:alpine
+  container_name: my-nginx
+  working_dir: /code
+  volumes:
+   - ./app/:/app
+   - ./docker/nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
+   - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+  ports:
+   - "8005:80"
+
+ php:
+  build: docker/php
+  container_name: my-php
+  working_dir: /code
+  volumes:
+   - ./code/:/code
+   - ./docker/php/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+  ports:
+   - "1215:1215" # Swoole port
+   # - "9000:9000" # PHP-FPM port
+
+ database1:
+  image: mysql:5.7
+  restart: always
+  environment:
+   - MYSQL_DATABASE=maco
+   - MYSQL_USER=homestead
+   - MYSQL_PASSWORD=secret
+   - MYSQL_ROOT_PASSWORD=secret
+  ports:
+   - "3322:3306"
